@@ -4,7 +4,7 @@ import withAuthorization from '../hoc/withAuthorization'
 
 const Account = props => (
   <div>
-    <h1 onClick={toggleTodo}>Account Page</h1>
+    <h1>Account Page</h1>
   </div>
 )
 
