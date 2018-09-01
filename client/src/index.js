@@ -16,29 +16,19 @@ import App from './components/App'
 const httpLink = createHttpLink({uri: 'http://localhost:8000/graphql'})
 
 const authLink = setContext((_, { headers }) => {
-  // get the authentication token from local storage if it exists
   const token = localStorage.getItem('token')
-  // return the headers to the context so httpLink can read them
-  return {
-    headers: {...headers, authorization: token ? `Bearer ${token}` : ''}
-  }
+  return { headers: {...headers, authorization: token ? `Bearer ${token}` : ''} }
 })
 
 const errorLink = onError(({ graphQLErrors, networkError }) => {
-  console.log('errorLink')
   if (graphQLErrors) {
     graphQLErrors.forEach(({ message, locations, path }) => {
-      console.log('GraphQL error1', message)
       if (message === 'NOT_AUTHENTICATED') signOut(client)
     })
   }
-  if (networkError) {
-    console.log('Network error1', networkError)
-    if (networkError.statusCode === 401) signOut(client)
-  }
+  if (networkError && networkError.statusCode === 401) signOut(client)
 })
 
-// const client = new ApolloClient({uri: 'http://localhost:8000/graphql'})
 const client = new ApolloClient({
   link: ApolloLink.from([authLink, httpLink, errorLink]),
   cache: new InMemoryCache()
